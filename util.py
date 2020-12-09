@@ -45,4 +45,3 @@ def GetVertex(graph, i):
 # Returns the incident edges on a vertex.
 def IncidentEdges(graph, v):
     return [e for e in graph.E if (e.a == v or e.b == v)]
-

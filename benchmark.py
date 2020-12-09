@@ -138,6 +138,8 @@ def PlayBenchmark(p1, p2, iters):
         wins[winner_a] += 1
         winner_b = PlayGraph(p2, p1, g2)
         wins[1-winner_b] += 1
+        print(wins[winner_a])
+        print(wins[1-winner_b])
     return wins
 
 
@@ -162,7 +164,7 @@ if __name__ == "__main__":
     # from percolator import PercolationPlayer
     # p1 = PercolationPlayer
     p2 = RandomPlayer
-    iters = 200
+    iters = 10
     wins = PlayBenchmark(p1, p2, iters)
     print(wins)
     print(
