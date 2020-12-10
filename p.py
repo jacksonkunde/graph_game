@@ -27,8 +27,31 @@ class PercolationPlayer:
         to_remove = {u for u in graph.V if len(IncidentEdges(graph, u)) == 0}
         graph.V.difference_update(to_remove)
 
-    def Heuristic(graph, player):
+    def RedmondHeuristic(graph, player):
         return len([v for v in graph.V if v.color == player]) - len([u for u in graph.V if u.color != player])
+
+    def VDegDistributionHeuristic(graph, player):
+        oursum = 0
+        opposum = 0
+        for v in graph.V:
+            degree = len(IncidentEdges(graph,v))
+            if v.color == player:
+                oursum += degree
+            else:
+                opposum += degree
+        return (oursum + opposum, oursum - opposum)
+
+    def combineHeuristics(graph, player):
+        normalizedRedmondHeuristic = 0.0
+        if len(graph.V) != 0:
+            normalizedRedmondHeuristic = PercolationPlayer.RedmondHeuristic(graph, player)/len(graph.V)
+
+        normalizedVDegHeuristic = 0.0
+        te = PercolationPlayer.VDegDistributionHeuristic(graph, player)
+        if te[0] != 0:
+            normalizedVDegHeuristic = te[1]/te[0]
+
+        return normalizedRedmondHeuristic + normalizedVDegHeuristic
 
     #at one degree
     def Children(graph, player):
@@ -38,7 +61,7 @@ class PercolationPlayer:
                 temp = copy.deepcopy(graph)
                 copiedV = PercolationPlayer.GetV(temp, v.index)
                 PercolationPlayer.Percolate(temp, copiedV)
-                children.append((v, PercolationPlayer.Heuristic(temp, player)))
+                children.append((v, PercolationPlayer.combineHeuristics(temp, player)))
         return children
 
     def ChooseVertexToRemove(graph, player):
