@@ -28,8 +28,12 @@ class PercolationPlayer:
         to_remove = {u for u in graph.V if len(IncidentEdges(graph, u)) == 0}
         graph.V.difference_update(to_remove)
 
+    def Heuristic(graph, player):
+        return len([v for v in graph.V if v.color == player]) - len([u for u in graph.V if u.color != player])
+
     def ChooseVertexToRemove(graph, player):
         it = copy.deepcopy(graph)
+        print(PercolationPlayer.Heuristic(it, player))
         #print(PercolationPlayer.GetE(graph, PercolationPlayer.GetV(graph, random.choice([v.index for  v in graph.V if v.color == player]))))
         return PercolationPlayer.GetV(it, random.choice([v.index for v in it.V if v.color == player]))
 
