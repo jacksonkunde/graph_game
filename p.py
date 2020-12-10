@@ -11,14 +11,27 @@ class PercolationPlayer:
     def ChooseVertexToColor(graph, player):
         return random.choice([v for v in graph.V if v.color == -1])
 
-    def Get(graph, i):
+    def GetV(graph, i):
         for v in graph.V:
             if v.index == i:
                 return v
         return None
 
+    def GetE(graph, v):
+        return [e for e in graph.E if (e.a == v or e.b == v)]
+
+    def Percolate(graph, i):
+        v = PercolationPlayer.GetV(graph, i)
+        for e in PercolationPlayer.GetE(graph, v):
+            graph.E.remove(e)
+        graph.V.remove(v)
+        to_remove = {u for u in graph.V if len(IncidentEdges(graph, u)) == 0}
+        graph.V.difference_update(to_remove)
+
     def ChooseVertexToRemove(graph, player):
-        return PercolationPlayer.Get(graph, random.choice([v.index for v in graph.V if v.color == player]))
+        it = copy.deepcopy(graph)
+        #print(PercolationPlayer.GetE(graph, PercolationPlayer.GetV(graph, random.choice([v.index for  v in graph.V if v.color == player]))))
+        return PercolationPlayer.GetV(it, random.choice([v.index for v in it.V if v.color == player]))
 
 
 
