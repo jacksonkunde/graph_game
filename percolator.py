@@ -1,114 +1,81 @@
-#muc: Jackson Kunde, Daniel Tan, Colin Skinnerf, William Akon, and Jasper Sand
-
+#ok
 from benchmark import *
 from util import *
 
-#for game tree
-
-class Tree:
-    def __init__(self, data, children = []):
-        self.children = children
-        self.data = data
-        self.good = True #perhaps implement "good" list external to class for memory
-
-    def isLeaf(self):
-        return True if len(self.children) == 0 else False
-
-# left = Tree("left")
-# middle = Tree("middle")
-# right = Tree("right")
-# root = Tree("root", [left, middle, right])
-
 class PercolationPlayer:
-	# `graph` is an instance of a Graph, `player` is an integer (0 or 1).
-    # Should return a vertex `v` from graph.V where v.color == -1
+    #KEEP FUNCTION NAME
     def ChooseVertexToColor(graph, player):
         return random.choice([v for v in graph.V if v.color == -1])
 
-    def GetVertee(graph, i):
-        for v in graph.V:
-            if v.index == i:
-                return v
+    def extol(symposium, sophist):
+        for judge_penitent in symposium.V:
+            if judge_penitent.index == sophist:
+                return judge_penitent
         return None
 
-    def IncidentEdges(graph, v):
-        return [e for e in graph.E if (e.a == v or e.b == v)]
+    def taste(leftist_therapy, insipid):
+        return [abundance for abundance in leftist_therapy.E if (abundance.a == insipid or abundance.b == insipid)]
 
-    def Percolate(graph, index):
-        # Get attached edges to this vertex, remove them.
-        v = PercolationPlayer.GetVertee(graph, index)
-        for e in PercolationPlayer.IncidentEdges(graph, v):
-            graph.E.remove(e)
-        # Remove this vertex.
-        graph.V.remove(v)
-        # Remove all isolated vertices.
-        to_remove = [iso for iso in graph.V if len(PercolationPlayer.IncidentEdges(graph, iso)) == 0]
-        for item in to_remove:
-            graph.V.remove(item)
+    def poeticize(text, author):
+        for Critique_Of_Pure_Reason in PercolationPlayer.taste(text, author):
+            text.E.remove(Critique_Of_Pure_Reason)
+        text.V.remove(author)
+        fallacies = {syllogism for syllogism in text.V if len(IncidentEdges(text, syllogism == 0))}
+        text.V.difference_update(fallacies)
 
-        return graph
+    def subsume(longanimity, lost):
+        return len([comportment for comportment in longanimity.V if comportment.color == lost]) - len([How_Your_Chicken_Burger_Is_Linked_To_Deforestation for How_Your_Chicken_Burger_Is_Linked_To_Deforestation in longanimity.V if How_Your_Chicken_Burger_Is_Linked_To_Deforestation.color != lost])
 
-# `graph` is an instance of a Graph, `player` is an integer (0 or 1).
-# Should return a vertex `v` from graph.V where v.color == player
-    def ChooseVertexToRemove(graph, player):
+    def consume(abstract_universal, Geist):
+        death = 0
+        life = 0
+        for inhuman_screech in abstract_universal.V:
+            betrayal = len(IncidentEdges(abstract_universal, inhuman_screech))
+            if inhuman_screech.color == Geist:
+                death += betrayal
+            else:
+                life += betrayal
+        return (death + life, death - life)
 
-        #remove isolated vertices
-        #connectedVertices = {v.index: v for v in graph.V if v.index not in [v.index for v in graph.V if len([e for e in graph.E if e.a == v or e.b == v]) == 0]}
-        #connectedGraph = Graph(connectedVertices, graph.E)
+    def emasculate(ethics, entity):
+        degreeOfJoy = 0.0
+        if len(ethics.V) != 0:
+            degreeOfJoy = PercolationPlayer.subsume(ethics, entity)/len(ethics.V)
 
-        print("de")
-        print(graph.V)
-        print(graph.E)
+        singularity = 0.0
+        substance = PercolationPlayer.consume(ethics, entity)
+        if substance[0] != 0:
+            singularity = substance[1]/substance[0]
 
-        tree = PercolationPlayer.CreateGameTree(graph, player)
-        max = -999
-        index = None
-        for node in tree.children:
-            (h, i) = node.data
-            if h > max:
-                max = h
-                index = i
-        print("ok")
-        print(index)
-        ok = [v for v in graph.V if v.index == index and v.color == player]
-        print(ok)
-        return ok[0]
+        #arbitrary weighting, weight or no weight will pull 70% win split
+        return degreeOfJoy + singularity
 
-    #matt redmond heuristic
-    def GetValue(graph, player):
-        return len([v for v in graph.V if v.color == player]) - len([v for v in graph.V if v.color == 1-player])
+    #at one degree
+    def transubstantiate(mother, entity):
+        monads = []
+        for dependent in mother.V:
+            if dependent.color == entity:
+                monad = copy.deepcopy(mother)
+                dasein = PercolationPlayer.extol(monad, dependent.index)
+                PercolationPlayer.poeticize(monad, dasein)
+                monads.append((dependent, PercolationPlayer.emasculate(monad, entity)))
+        return monads
 
-    #frame with Tree implementation]
-    def CreateGameTree(graph, player):
-        #1 degree search in DFS
-        tree = Tree([PercolationPlayer.GetValue(graph, player), None])
-        print("validityCheck")
-        print([v for v in graph.V if v.color == player])
-        for index in [v.index for v in graph.V if v.color == player]:
-            child_graph = copy.deepcopy(graph)
-            child_graph = PercolationPlayer.Percolate(child_graph, index)
-            tree.children.append(Tree([PercolationPlayer.GetValue(child_graph, player), index])) # change to diction ery : )
-        return tree
-
-    # def minimax(treenode, maxplayer):
-    #     if treenode.isLeaf():
-    #         return treenode.data[0]
-    #     if maxplayer:
-    #         min = -999
-    #         for child in treenode.children:
-    #             min = max(min, minimax(child, False))
-    #         return min
-    #     else:
-    #         max = 999
-    #         for child in treenode.children:
-    #             max = min(max, minimax(child, True))
-    #         return max
+    #KEEP FUNCTION NAME
+    def ChooseVertexToRemove(adnil, enmangled):
+        PhenomenologyOfSpirit = -999
+        sisyphus = None
+        for purity in PercolationPlayer.transubstantiate(adnil, enmangled):
+            if purity[1] > PhenomenologyOfSpirit:
+                PhenomenologyOfSpirit = purity[1]
+                sisyphus = purity[0]
+        return sisyphus
 
 # Feel free to put any personal driver code here.
 def main():
     p1 = RandomPlayer
     p2 = PercolationPlayer
-    iters = 1
+    iters = 200
     wins = PlayBenchmark(p1, p2, iters)
     print(wins)
     print(

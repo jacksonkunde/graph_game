@@ -2,11 +2,6 @@
 from benchmark import *
 from util import *
 
-class Tree:
-    def __init__(self, data, children = []):
-        self.children = children
-        self.data = data #ideally tuple
-
 class PercolationPlayer:
     def ChooseVertexToColor(graph, player):
         return random.choice([v for v in graph.V if v.color == -1])
@@ -30,7 +25,7 @@ class PercolationPlayer:
     def RedmondHeuristic(graph, player):
         return len([v for v in graph.V if v.color == player]) - len([u for u in graph.V if u.color != player])
 
-    def VDegDistributionHeuristic(graph, player):
+    def VDegSumHeuristic(graph, player):
         oursum = 0
         opposum = 0
         for v in graph.V:
@@ -47,10 +42,11 @@ class PercolationPlayer:
             normalizedRedmondHeuristic = PercolationPlayer.RedmondHeuristic(graph, player)/len(graph.V)
 
         normalizedVDegHeuristic = 0.0
-        te = PercolationPlayer.VDegDistributionHeuristic(graph, player)
+        te = PercolationPlayer.VDegSumHeuristic(graph, player)
         if te[0] != 0:
             normalizedVDegHeuristic = te[1]/te[0]
 
+        #arbitrary weighting, weight or no weight will pull 70% win split
         return normalizedRedmondHeuristic + normalizedVDegHeuristic
 
     #at one degree
