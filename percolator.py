@@ -31,58 +31,84 @@ class PercolationPlayer:
                 return v
         return None
 
+    def IncidentEdges(graph, v):
+        return [e for e in graph.E if (e.a == v or e.b == v)]
+
+    def Percolate(graph, index):
+        # Get attached edges to this vertex, remove them.
+        v = PercolationPlayer.GetVertee(graph, index)
+        for e in PercolationPlayer.IncidentEdges(graph, v):
+            graph.E.remove(e)
+        # Remove this vertex.
+        graph.V.remove(v)
+        # Remove all isolated vertices.
+        to_remove = [iso for iso in graph.V if len(PercolationPlayer.IncidentEdges(graph, iso)) == 0]
+        for item in to_remove:
+            graph.V.remove(item)
+
+        return graph
+
 # `graph` is an instance of a Graph, `player` is an integer (0 or 1).
 # Should return a vertex `v` from graph.V where v.color == player
-
     def ChooseVertexToRemove(graph, player):
 
         #remove isolated vertices
-        connectedVertices = {v.index: v for v in graph.V if v.index not in [v.index for v in graph.V if len([e for e in graph.E if e.a == v or e.b == v]) == 0]}
-        connectedGraph = Graph(connectedVertices, graph.E)
+        #connectedVertices = {v.index: v for v in graph.V if v.index not in [v.index for v in graph.V if len([e for e in graph.E if e.a == v or e.b == v]) == 0]}
+        #connectedGraph = Graph(connectedVertices, graph.E)
+
+        print("de")
+        print(graph.V)
+        print(graph.E)
 
         tree = PercolationPlayer.CreateGameTree(graph, player)
-        g = [(node.data[0], node.data[1]) for node in tree.children]
-        min = -999
-        storage = Vertex(-999, -999)
-        for item in g:
-            if item[0] > min:
-                min = item[0]
-                storage = Vertex(item[1], player)
-        return storage
+        max = -999
+        index = None
+        for node in tree.children:
+            (h, i) = node.data
+            if h > max:
+                max = h
+                index = i
+        print("ok")
+        print(index)
+        ok = [v for v in graph.V if v.index == index and v.color == player]
+        print(ok)
+        return ok[0]
 
     #matt redmond heuristic
     def GetValue(graph, player):
-        return len([v for v in graph.V if v.color == player]) - len([v for v in graph.V if v.color == 1 - player])
+        return len([v for v in graph.V if v.color == player]) - len([v for v in graph.V if v.color == 1-player])
 
     #frame with Tree implementation]
     def CreateGameTree(graph, player):
         #1 degree search in DFS
-        tree = Tree("root")
+        tree = Tree([PercolationPlayer.GetValue(graph, player), None])
+        print("validityCheck")
+        print([v for v in graph.V if v.color == player])
         for index in [v.index for v in graph.V if v.color == player]:
-            result = Graph({ve.index: ve for ve in graph.V if ve.index != index}.values(), [edge for edge in graph.E if (edge.a != index or ed.b != index)])
-            tree.children.append(Tree((PercolationPlayer.GetValue(result, player), index)))
+            child_graph = copy.deepcopy(graph)
+            child_graph = PercolationPlayer.Percolate(child_graph, index)
+            tree.children.append(Tree([PercolationPlayer.GetValue(child_graph, player), index])) # change to diction ery : )
         return tree
 
-
-    def minimax(treenode, maxplayer):
-        if treenode.isLeaf():
-            return treenode.data[0]
-        if maxplayer:
-            min = -999
-            for child in treenode.children:
-                min = max(min, minimax(child, False))
-            return min
-        else:
-            max = 999
-            for child in treenode.children:
-                max = min(max, minimax(child, True))
-            return max
+    # def minimax(treenode, maxplayer):
+    #     if treenode.isLeaf():
+    #         return treenode.data[0]
+    #     if maxplayer:
+    #         min = -999
+    #         for child in treenode.children:
+    #             min = max(min, minimax(child, False))
+    #         return min
+    #     else:
+    #         max = 999
+    #         for child in treenode.children:
+    #             max = min(max, minimax(child, True))
+    #         return max
 
 # Feel free to put any personal driver code here.
 def main():
     p1 = RandomPlayer
     p2 = PercolationPlayer
-    iters = 200
+    iters = 1
     wins = PlayBenchmark(p1, p2, iters)
     print(wins)
     print(

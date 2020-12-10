@@ -94,19 +94,23 @@ def PlayGraph(s, t, graph):
             chosen_vertex = RandomPlayer.ChooseVertexToRemove(copy.deepcopy(graph), active_player)
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
+            print("what")
             return 1 - active_player
         # Next, check that their output was reasonable.
         try:
             original_vertex = GetVertex(graph, chosen_vertex.index)
             if not original_vertex:
+                print("there is no original vertex")
                 return 1 - active_player
             if original_vertex.color != active_player:
+                print("you tried to remove other player vertex")
                 return 1 - active_player
             # If output is reasonable, remove ("percolate") this vertex + edges attached to it, as well as isolated vertices.
             Percolate(graph, original_vertex)
         # Only case when this should fire is if chosen_vertex.index does not exist or similar error.
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
+            print("what2")
             return 1 - active_player
         # Swap current player
         active_player = 1 - active_player
@@ -138,8 +142,6 @@ def PlayBenchmark(p1, p2, iters):
         wins[winner_a] += 1
         winner_b = PlayGraph(p2, p1, g2)
         wins[1-winner_b] += 1
-        print(wins[winner_a])
-        print(wins[1-winner_b])
     return wins
 
 
