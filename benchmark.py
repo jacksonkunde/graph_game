@@ -1,3 +1,4 @@
+#ok
 import random
 import itertools
 import copy

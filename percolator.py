@@ -1,4 +1,4 @@
-#ok
+#okok
 from benchmark import *
 from util import *
 

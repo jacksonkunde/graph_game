@@ -1,4 +1,4 @@
-#ok
+#okok
 from benchmark import *
 from util import *
 
@@ -14,6 +14,20 @@ class PercolationPlayer:
         return None
 
     def ChooseVertexToColor(graph, player):
+        # ok = [v for v in graph.V if v.color == -1]
+        # if len(ok) <= 20:
+        #     for v in graph.V:
+        #         if v.color == -1 and len(PercolationPlayer.GetE(graph,v)) == 2:
+        #             for e in PercolationPlayer.GetE(graph, v):
+        #                 if e.a.index == v.index:
+        #                     if len(PercolationPlayer.GetE(graph, e.b)) == 1:
+        #                         if PercolationPlayer.GetE(graph, e.b)[0].a.color == 1-player or PercolationPlayer.GetE(graph, e.b)[0].b.color == 1-player:
+        #                             return v
+        #                 elif e.b.index == v.index:
+        #                     if len(PercolationPlayer.GetE(graph, e.a)) == 1:
+        #                         if PercolationPlayer.GetE(graph, e.a)[0].a.color == 1-player or PercolationPlayer.GetE(graph, e.a)[0].b.color == 1-player:
+        #                             return v
+
         currMax = -999
         chosen = None
         for i in [v for v in graph.V if v.color == -1]:

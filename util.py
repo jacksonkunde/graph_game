@@ -1,3 +1,4 @@
+#ok
 class Vertex:
     def __init__(self, index, color=-1):
         self.index = index
