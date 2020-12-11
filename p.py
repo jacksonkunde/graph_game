@@ -3,8 +3,9 @@ from benchmark import *
 from util import *
 
 class PercolationPlayer:
-    def ChooseVertexToColor(graph, player):
-        return random.choice([v for v in graph.V if v.color == -1])
+
+    def GetE(graph, v):
+        return [e for e in graph.E if (e.a == v or e.b == v)]
 
     def GetV(graph, i):
         for v in graph.V:
@@ -12,14 +13,20 @@ class PercolationPlayer:
                 return v
         return None
 
-    def GetE(graph, v):
-        return [e for e in graph.E if (e.a == v or e.b == v)]
+    def ChooseVertexToColor(graph, player):
+        currMax = -999
+        chosen = None
+        for i in [v for v in graph.V if v.color == -1]:
+            if len(PercolationPlayer.GetE(graph, i)) > currMax:
+                currMax = len(PercolationPlayer.GetE(graph, i))
+                chosen = i
+        return PercolationPlayer.GetV(graph, chosen.index)
 
     def Percolate(graph, v):
         for e in PercolationPlayer.GetE(graph, v):
             graph.E.remove(e)
         graph.V.remove(v)
-        to_remove = {u for u in graph.V if len(IncidentEdges(graph, u)) == 0}
+        to_remove = {u for u in graph.V if len(PercolationPlayer.GetE(graph, u)) == 0}
         graph.V.difference_update(to_remove)
 
     def RedmondHeuristic(graph, player):
@@ -29,7 +36,7 @@ class PercolationPlayer:
         oursum = 0
         opposum = 0
         for v in graph.V:
-            degree = len(IncidentEdges(graph,v))
+            degree = len(PercolationPlayer.GetE(graph,v))
             if v.color == player:
                 oursum += degree
             else:
@@ -46,7 +53,11 @@ class PercolationPlayer:
         if te[0] != 0:
             normalizedVDegHeuristic = te[1]/te[0]
 
+        #balance based on number of actual vertices left in graph
         #arbitrary weighting, weight or no weight will pull 70% win split
+        # if len(graph.E) < 50:
+        #     return (1-(len(graph.E)/50))*normalizedRedmondHeuristic + (len(graph.E)/50)*normalizedVDegHeuristic
+        # else:
         return normalizedRedmondHeuristic + normalizedVDegHeuristic
 
     #at one degree
