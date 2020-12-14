@@ -3,7 +3,6 @@ from benchmark import *
 from util import *
 
 class PercolationPlayer:
-
     def GetE(graph, v):
         return [e for e in graph.E if (e.a == v or e.b == v)]
 
@@ -14,20 +13,6 @@ class PercolationPlayer:
         return None
 
     def ChooseVertexToColor(graph, player):
-        # ok = [v for v in graph.V if v.color == -1]
-        # if len(ok) <= 20:
-        #     for v in graph.V:
-        #         if v.color == -1 and len(PercolationPlayer.GetE(graph,v)) == 2:
-        #             for e in PercolationPlayer.GetE(graph, v):
-        #                 if e.a.index == v.index:
-        #                     if len(PercolationPlayer.GetE(graph, e.b)) == 1:
-        #                         if PercolationPlayer.GetE(graph, e.b)[0].a.color == 1-player or PercolationPlayer.GetE(graph, e.b)[0].b.color == 1-player:
-        #                             return v
-        #                 elif e.b.index == v.index:
-        #                     if len(PercolationPlayer.GetE(graph, e.a)) == 1:
-        #                         if PercolationPlayer.GetE(graph, e.a)[0].a.color == 1-player or PercolationPlayer.GetE(graph, e.a)[0].b.color == 1-player:
-        #                             return v
-
         currMax = -999
         chosen = None
         for i in [v for v in graph.V if v.color == -1]:
@@ -36,7 +21,7 @@ class PercolationPlayer:
                 chosen = i
         return PercolationPlayer.GetV(graph, chosen.index)
 
-    def Percolate(graph, v):
+    def Percolate(graph, v): #FGraph
         for e in PercolationPlayer.GetE(graph, v):
             graph.E.remove(e)
         graph.V.remove(v)
@@ -67,38 +52,46 @@ class PercolationPlayer:
         if te[0] != 0:
             normalizedVDegHeuristic = te[1]/te[0]
 
-        #balance based on number of actual vertices left in graph
-        #arbitrary weighting, weight or no weight will pull 70% win split
-        # if len(graph.E) < 50:
-        #     return (1-(len(graph.E)/50))*normalizedRedmondHeuristic + (len(graph.E)/50)*normalizedVDegHeuristic
-        # else:
         return normalizedRedmondHeuristic + normalizedVDegHeuristic
 
-    #at one degree
+    #at two degrees if graph smaller than 10 vertices
     def Children(graph, player):
-        children = []
-        for v in graph.V:
-            if v.color == player:
+        maxheur = -999
+        result = None
+        if len(graph.V) > 10:
+            for v in [vertex for vertex in graph.V if vertex.color == player]:
                 temp = copy.deepcopy(graph)
-                copiedV = PercolationPlayer.GetV(temp, v.index)
-                PercolationPlayer.Percolate(temp, copiedV)
-                children.append((v, PercolationPlayer.combineHeuristics(temp, player)))
-        return children
+                PercolationPlayer.Percolate(temp, PercolationPlayer.GetV(temp, v.index))
+                current = PercolationPlayer.combineHeuristics(temp, player)
+                if current > maxheur:
+                    maxheur = current
+                    result = v
+            return result
+        else:
+            for v in [vertex for vertex in graph.V if vertex.color == player]:
+                temp = copy.deepcopy(graph)
+                PercolationPlayer.Percolate(temp, PercolationPlayer.GetV(temp, v.index))
+                ourH = PercolationPlayer.combineHeuristics(temp, player)
+                theirH = 999
+                for ve in [vert for vert in temp.V if vert.color == 1-player]:
+                    temp2 = copy.deepcopy(temp)
+                    PercolationPlayer.Percolate(temp2, PercolationPlayer.GetV(temp2, ve.index))
+                    ok = (-1)*PercolationPlayer.combineHeuristics(temp2, 1-player)
+                    if ok < theirH:
+                        theirH = ok
+                if ourH+theirH > maxheur:
+                    maxheur = ourH+theirH
+                    result = v
+            return result
 
     def ChooseVertexToRemove(graph, player):
-        maxHeur = -999
-        chosen = None
-        for item in PercolationPlayer.Children(graph, player):
-            if item[1] > maxHeur:
-                maxHeur = item[1]
-                chosen = item[0]
-        return chosen
+        return PercolationPlayer.Children(graph, player)
 
 # Feel free to put any personal driver code here.
 def main():
     p1 = RandomPlayer
     p2 = PercolationPlayer
-    iters = 200
+    iters = 500
     wins = PlayBenchmark(p1, p2, iters)
     print(wins)
     print(

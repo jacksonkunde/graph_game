@@ -11,7 +11,6 @@ import errno
 
 from util import *
 
-
 # Removes the given vertex v from the graph, as well as the edges attached to it.
 # Removes all isolated vertices from the graph as well.
 def Percolate(graph, v):
@@ -38,7 +37,6 @@ class Timeout:
         signal.setitimer(signal.ITIMER_REAL, self.seconds)
     def __exit__(self, type, value, traceback):
         signal.alarm(0)
-
 
 # This is the main game loop.
 def PlayGraph(s, t, graph):
@@ -143,8 +141,6 @@ def PlayBenchmark(p1, p2, iters):
         wins[winner_a] += 1
         winner_b = PlayGraph(p2, p1, g2)
         wins[1-winner_b] += 1
-        print(wins[winner_a])
-        print(wins[1-winner_b])
     return wins
 
 

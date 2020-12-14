@@ -3,73 +3,89 @@ from benchmark import *
 from util import *
 
 class PercolationPlayer:
-    #KEEP FUNCTION NAME
-    def ChooseVertexToColor(graph, player):
-        return random.choice([v for v in graph.V if v.color == -1])
+    def GetE(graph, v):
+        return [e for e in graph.E if (e.a == v or e.b == v)]
 
-    def extol(symposium, sophist):
-        for judge_penitent in symposium.V:
-            if judge_penitent.index == sophist:
-                return judge_penitent
+    def GetV(graph, i):
+        for v in graph.V:
+            if v.index == i:
+                return v
         return None
 
-    def taste(leftist_therapy, insipid):
-        return [abundance for abundance in leftist_therapy.E if (abundance.a == insipid or abundance.b == insipid)]
+    def ChooseVertexToColor(graph, player):
+        currMax = -999
+        chosen = None
+        for i in [v for v in graph.V if v.color == -1]:
+            if len(PercolationPlayer.GetE(graph, i)) > currMax:
+                currMax = len(PercolationPlayer.GetE(graph, i))
+                chosen = i
+        return PercolationPlayer.GetV(graph, chosen.index)
 
-    def poeticize(text, author):
-        for Critique_Of_Pure_Reason in PercolationPlayer.taste(text, author):
-            text.E.remove(Critique_Of_Pure_Reason)
-        text.V.remove(author)
-        fallacies = {syllogism for syllogism in text.V if len(IncidentEdges(text, syllogism == 0))}
-        text.V.difference_update(fallacies)
+    def Percolate(graph, v):
+        for e in PercolationPlayer.GetE(graph, v):
+            graph.E.remove(e)
+        graph.V.remove(v)
+        to_remove = {u for u in graph.V if len(PercolationPlayer.GetE(graph, u)) == 0}
+        graph.V.difference_update(to_remove)
 
-    def subsume(longanimity, lost):
-        return len([comportment for comportment in longanimity.V if comportment.color == lost]) - len([How_Your_Chicken_Burger_Is_Linked_To_Deforestation for How_Your_Chicken_Burger_Is_Linked_To_Deforestation in longanimity.V if How_Your_Chicken_Burger_Is_Linked_To_Deforestation.color != lost])
+    def RedmondHeuristic(graph, player):
+        return len([v for v in graph.V if v.color == player]) - len([u for u in graph.V if u.color != player])
 
-    def consume(abstract_universal, Geist):
-        death = 0
-        life = 0
-        for inhuman_screech in abstract_universal.V:
-            betrayal = len(IncidentEdges(abstract_universal, inhuman_screech))
-            if inhuman_screech.color == Geist:
-                death += betrayal
+    def VDegSumHeuristic(graph, player):
+        oursum = 0
+        opposum = 0
+        for v in graph.V:
+            degree = len(PercolationPlayer.GetE(graph,v))
+            if v.color == player:
+                oursum += degree
             else:
-                life += betrayal
-        return (death + life, death - life)
+                opposum += degree
+        return (oursum + opposum, oursum - opposum)
 
-    def emasculate(ethics, entity):
-        degreeOfJoy = 0.0
-        if len(ethics.V) != 0:
-            degreeOfJoy = PercolationPlayer.subsume(ethics, entity)/len(ethics.V)
+    def combineHeuristics(graph, player):
+        normalizedRedmondHeuristic = 0.0
+        if len(graph.V) != 0:
+            normalizedRedmondHeuristic = PercolationPlayer.RedmondHeuristic(graph, player)/len(graph.V)
 
-        singularity = 0.0
-        substance = PercolationPlayer.consume(ethics, entity)
-        if substance[0] != 0:
-            singularity = substance[1]/substance[0]
+        normalizedVDegHeuristic = 0.0
+        te = PercolationPlayer.VDegSumHeuristic(graph, player)
+        if te[0] != 0:
+            normalizedVDegHeuristic = te[1]/te[0]
 
-        #arbitrary weighting, weight or no weight will pull 70% win split
-        return degreeOfJoy + singularity
+        return normalizedRedmondHeuristic + normalizedVDegHeuristic
 
-    #at one degree
-    def transubstantiate(mother, entity):
-        monads = []
-        for dependent in mother.V:
-            if dependent.color == entity:
-                monad = copy.deepcopy(mother)
-                dasein = PercolationPlayer.extol(monad, dependent.index)
-                PercolationPlayer.poeticize(monad, dasein)
-                monads.append((dependent, PercolationPlayer.emasculate(monad, entity)))
-        return monads
+    #at two degrees if graph smaller than 10 vertices
+    def Children(graph, player):
+        maxheur = -999
+        result = None
+        if len(graph.V) > 10:
+            for v in [vertex for vertex in graph.V if vertex.color == player]:
+                temp = copy.deepcopy(graph)
+                PercolationPlayer.Percolate(temp, PercolationPlayer.GetV(temp, v.index))
+                current = PercolationPlayer.combineHeuristics(temp, player)
+                if current > maxheur:
+                    maxheur = current
+                    result = v
+            return result
+        else:
+            for v in [vertex for vertex in graph.V if vertex.color == player]:
+                temp = copy.deepcopy(graph)
+                PercolationPlayer.Percolate(temp, PercolationPlayer.GetV(temp, v.index))
+                ourH = PercolationPlayer.combineHeuristics(temp, player)
+                theirH = 999
+                for ve in [vert for vert in temp.V if vert.color == 1-player]:
+                    temp2 = copy.deepcopy(temp)
+                    PercolationPlayer.Percolate(temp2, PercolationPlayer.GetV(temp2, ve.index))
+                    ok = (-1)*PercolationPlayer.combineHeuristics(temp2, 1-player)
+                    if ok < theirH:
+                        theirH = ok
+                if ourH+theirH > maxheur:
+                    maxheur = ourH+theirH
+                    result = v
+            return result
 
-    #KEEP FUNCTION NAME
-    def ChooseVertexToRemove(adnil, enmangled):
-        PhenomenologyOfSpirit = -999
-        sisyphus = None
-        for purity in PercolationPlayer.transubstantiate(adnil, enmangled):
-            if purity[1] > PhenomenologyOfSpirit:
-                PhenomenologyOfSpirit = purity[1]
-                sisyphus = purity[0]
-        return sisyphus
+    def ChooseVertexToRemove(graph, player):
+        return PercolationPlayer.Children(graph, player)
 
 # Feel free to put any personal driver code here.
 def main():
