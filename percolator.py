@@ -13,12 +13,20 @@ class PercolationPlayer:
         return None
 
     def ChooseVertexToColor(graph, player):
-        currMax = -999
-        chosen = None
+        currMax, lastMax, colorMax, chosen, lastchosen, currNC, lastNC = -999, -999, -999, None, None, -999, None
         for i in [v for v in graph.V if v.color == -1]:
-            if len(PercolationPlayer.GetE(graph, i)) > currMax:
-                currMax = len(PercolationPlayer.GetE(graph, i))
-                chosen = i
+            ne = len(PercolationPlayer.GetE(graph, i))
+            if ne >= currMax:
+                nc = 0
+                for e in PercolationPlayer.GetE(graph, i):
+                    if (e.a == i):
+                        if (PercolationPlayer.GetV(graph, e.b.index).color == player): nc += 1
+                    if (e.b == i):
+                        if (PercolationPlayer.GetV(graph, e.a.index).color == player): nc += 1
+                lastMax, lastNC, lastchosen = currMax, currNC, chosen
+                currMax, currNC, chosen = ne, nc, i
+                if lastMax == currMax and lastNC>currNC:
+                    currNC, chosen = lastNC, lastchosen
         return PercolationPlayer.GetV(graph, chosen.index)
 
     def Percolate(graph, v):
